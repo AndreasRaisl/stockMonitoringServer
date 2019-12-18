@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Volkswagen",
+    "wkn": 112233,
+    "price": 120
+  },
+  {
+    "id": 2,
+    "name": "Allianz",
+    "wkn": 223344,
+    "price": 130
+  },
+  {
+    "id": 3,
+    "name": "BASF",
+    "wkn": 334455,
+    "price": 140
+  },
+  {
+    "id": 4,
+    "name": "Fresenius",
+    "wkn": 445599,
+    "price": 150
+  },
+  {
+    "id": 5,
+    "name": "Adidas",
+    "wkn": "456",
+    "price": 111
+  }
+]

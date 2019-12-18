@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> Aktie hinzufügen  </title>
+  <link rel="stylesheet" href="mainView.css">
+</head>
+<body>
+  <header class="mainHeader">
+    <nav class="nav">
+      <ul class="navLinks">
+        <li class="navLink"> <a href="/"> Alle meine Aktien   </a></li>
+        <li class="navLink"> <a href="/add-stock"> Aktie hinzufügen </a></li>       
+      </ul>
+    </nav>
+  </header>
+  <form action="/add-stock" method="POST">
+    <div class="form-control">
+      <label for="stockTitle"> Name der Aktie </label>
+      <input type="text" name="stockTitle" id="stockTitle">
+    </div>
+    <div class="form-control">
+      <label for="wkn"> WKN </label>
+      <input type="text" name="wkn" id="wkn">
+    </div>  
+  </form>
+  
+</body>
+</html>
+
+
+
+
+
