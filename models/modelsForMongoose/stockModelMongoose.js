@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const StockSchema = new Schema( {
-  id: number,
+const StockSchema = new Schema({
   name: String,
-  wkn: number,
-  price: mumber
+  wkn: Number,
+  price: Number
 });
 
 module.exports = mongoose.model('stock', StockSchema, 'stocks');

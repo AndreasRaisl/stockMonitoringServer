@@ -4,18 +4,22 @@ var cors = require('cors');
 const bodyParser = require('body-parser');
 const routes = require('./routes/routes');
 const Handlebars = require('express-handlebars');
-
-const PORT = 3000;
+const connectDB = require('./database/connection');
 const app = express();
+const PORT = 3000;
 
 app.engine('hbs', Handlebars());
 app.set('view engine', 'hbs');
 app.set('views', 'views');
 
 app.get('/favicon.ico', (req, res) => res.status(204));
+
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+connectDB();
+
 app.use(express.static(path.join(__dirname, 'styles')));
 
 app.use(routes);

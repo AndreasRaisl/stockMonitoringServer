@@ -1,5 +1,7 @@
 const path = require('path')
 const Stock = require('../models/classDefinitions/stock');
+const StockModelForDatabase = require('../models/modelsForMongoose/stockModelMongoose');
+const stocksApi = require('../callAPI/callAPI');
 const constructPath = require('./../utils/constructPath');
 let parentDir = constructPath.getParentDir();
 
@@ -7,16 +9,39 @@ let parentDir = constructPath.getParentDir();
 // const myStocks = JSON.parse(dataFromFile);
 
 exports.getAllStocksView = (req, res) => {
-  console.log("Got a request to the main page");
-  Stock.getAllStocks((stocks) => {
-    res.status(200).render('mainView', {stocks: stocks, stockListEmpty: stocks.length == 0});
-  }); 
+  console.log("Got a request to the main page showing a view of all stocks in the portfolio");
+  // Stock.getAllStocks((stocks) => {
+  //   //insertCurrentPrices(stocks);
+  //   res.status(200).render('mainView', {stocks: stocks, stockListEmpty: stocks.length == 0});
+  // });
+  StockModelForDatabase.find()
+    .then((stocks) => {
+
+      res.status(200).render('mainView', {stocks: stocks, stockListEmpty: stocks.length == 0});
+  });
+
   // res.status(200).sendFile(path.join(__dirname, '../', 'views', 'mainView.html'));  
 };
 
+
 exports.getAllStocksData = (req, res, next) => {
   console.log('Got a request to /api/stocks');
-  res.status(200).sendFile(path.join(parentDir, 'data', 'stocks.json'));
+  //get stocks from the database
+  StockModelForDatabase.find()
+    .then((stocks) => {
+      // stocks.forEach((stock) => {
+      //   stocksApi.getPrice(stock, (newPrice) => {
+      //     stock.price = newPrice;
+      //   });
+      // });
+      res.status(200).json(stocks);
+    });
+  
+  //     // fill up the prices by making API call
+  //     // send the data as one array
+  //   });
+  
+  // res.status(200).sendFile(path.join(parentDir, 'data', 'stocks.json'));
 };
 
 exports.getAddStockView = (req, res, next) => {
@@ -30,11 +55,106 @@ exports.addStock = (req, res) => {
     res.redirect('/incompleteInput');
   }
   else {
-    let stockToAdd = new Stock(req.body.name, req.body.wkn);      
-    stockToAdd.addStock(); 
-    res.redirect('/');     
-  } 
+    // let stockToAdd = new Stock(req.body.name, req.body.wkn);      
+    // stockToAdd.addStock(); 
+    // add stock to database
+    let stockToAddDatabase = new StockModelForDatabase();
+    stockToAddDatabase.name = req.body.name;
+    stockToAddDatabase.wkn = req.body.wkn;
+    stockToAddDatabase.price = 150;
+    let stockToAdd = new Stock(req.body.name, req.body.wkn);
+    stocksApi.getPrice(stockToAddDatabase);
+
+  
+    stockToAddDatabase.save((err, savedStock) => {
+      if(err) console.log('Error saving the stock to database');
+      else {
+        console.log('Saved to DB successfully');
+        res.status(200).json(savedStock);
+      } 
+    });
+  }
+}
+
+exports.updatePrice = (req, res) => {
+  console.log('Got a request to update the price of a stock');  
+  let stock = req.body;
+  stocksApi.getPrice(stock)
+    .then((newPrice) => {
+      console.log('Und auch updatePrice sagt, der Preis ist: ' + newPrice);
+      updatePriceInDatabase(stock, newPrice) 
+        .then((successValue)  => {
+          console.log('And finally here is the successValue: ' + successValue.data);
+          res.json(successValue.data);
+        });
+    });
 };
+
+exports.deleteStock = (req, res) => {
+  let idToDelete = req.params.id; 
+  // StockModelForDatabase.findByIdAndRemove(idToDelete, (err, deletedStock) => {
+  //   if(err) {
+  //     console.log(err);
+  //     res.send('Error deleting record');
+  //   } else {
+  //     console.log("Successful deletion");
+  //     res.json(deletedStock);
+  //   }
+  // }); 
+  
+  StockModelForDatabase.findByIdAndRemove(idToDelete).then((result) => {
+    console.log("Successful deletion");
+    res.json(deletedStock);
+  });
+  
+  // StockModelForDatabase.findOneAndRemove({name: req.body.name}).then((response) => {
+
+  // }
+}
+
+
+// customerObject.deleteOne(query, function (err, result) {
+
+//   if (err) {
+
+//       console.log("error query");
+
+//   } else {
+
+//       console.log(result);
+
+//   }
+
+// });
+
+function updatePriceInDatabase(stock, newPrice) {
+  console.log('The actual name is :' + stock.name);
+  let nameToFind = stock.name;
+  console.log('The actual _id is :' + stock._id);
+  let idToFind = stock._id;
+  return new Promise((resolve, reject) => {
+    //StockModelForDatabase.findOneAndUpdate({name: nameToFind},{$set:{price: newPrice}},{new:true})
+    StockModelForDatabase.findOneAndUpdate({_id: idToFind},{$set:{price: newPrice}},{new:true})
+      .then((updatedDoc)=>{
+      if(updatedDoc) {
+        console.log('Successfully updated in database');
+        resolve({success:true, data:updatedDoc});
+      } else {
+        console.log('Error updating database');
+        reject({success:false,data:"Document to update not found in Database"});
+      }
+    });
+  });  
+}
+      
+      
+    
+
+    
+
+    
+    
+   
 
 
 

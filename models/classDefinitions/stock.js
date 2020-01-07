@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const dbConnector = require('../../database/connection');
 
 const constructPath = require('../../utils/constructPath');
 let parentDir = constructPath.getParentDir();
@@ -11,6 +12,11 @@ const fetchStocks = (callback) => {
     callback(JSON.parse(data));
   });
 };
+
+const fetchStocksFromDb = (callback) => {
+  StockDbModel.find();
+  //connect to database
+}
 
 module.exports = class Stock {
 
@@ -35,5 +41,6 @@ module.exports = class Stock {
 
   static getAllStocks(callback) {
     fetchStocks(callback);
+    //insert the actual prices in all received stocks
   }
 }
