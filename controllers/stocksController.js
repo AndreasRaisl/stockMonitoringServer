@@ -54,8 +54,9 @@ exports.getAddStockView = (req, res) => {
 };
 
 exports.addStock = (req, res) => {
-  console.log('Got a request to POST add-stock');    
-  if(!req.body.name || !req.body.wkn) {
+  console.log('Got a request to POST add-stock');   
+  if(!req.body.selectedStock || !req.body.wkn) {
+    console.log('Going into error');
     res.redirect('/incompleteInput');
   }
   else {
@@ -63,29 +64,31 @@ exports.addStock = (req, res) => {
     // stockToAdd.addStock(); 
     // add stock to database
     let stockToAddDatabase = new StockModelForDatabase();
-    stockToAddDatabase.name = req.body.name;
-    stockToAddDatabase.wkn = req.body.wkn;
-    stockToAddDatabase.price = 150;
+    stockToAddDatabase.name = req.body.selectedStock;
+    stockToAddDatabase.wkn = req.body.wkn;    
     
-    stocksApi.getPrice(stockToAddDatabase);
-  
-    // stockToAddDatabase.save((err, savedStock) => {
-    //   if(err) console.log('Error saving the stock to database');
-    //   else {
-    //     console.log('Saved to DB successfully');
-    //     res.status(200).json(savedStock);
-    //   } 
-    // });
+    stocksApi.getPrice(stockToAddDatabase).then((successValue) => {
+      stockToAddDatabase.price = successValue;
+      stockToAddDatabase.save((err, savedStock) => {
+        if(err) console.log('Error saving the stock to database');
+        else {
+          console.log('Saved to DB successfully');
+          res.status(200).json(savedStock);
+        } 
+      });
+    }).catch((error) => {
+      console.log(error);
+    });    
 
-    UserModelForDatabase.findOne({username: currentUser}).then((result) => {
-      result.stocks.push(stockToAddDatabase);
-      result.save().then((result) => {
-        console.log('Saved to DB successfully');
-        res.status(200).json(result);
-      }).catch((error) => {
-        console.log('Error saving the new stock to the database: ' + error);
-      });      
-    });
+    // UserModelForDatabase.findOne({username: currentUser}).then((result) => {
+    //   result.stocks.push(stockToAddDatabase);
+    //   result.save().then((result) => {
+    //     console.log('Saved to DB successfully');
+    //     res.status(200).json(result);
+    //   }).catch((error) => {
+    //     console.log('Error saving the new stock to the database: ' + error);
+    //   });      
+    // });
   }
 }
 
@@ -94,10 +97,8 @@ exports.updatePrice = (req, res) => {
   let stock = req.body;
   stocksApi.getPrice(stock)
     .then((newPrice) => {
-      console.log('Und auch updatePrice sagt, der Preis ist: ' + newPrice);
       updatePriceInDatabase(stock, newPrice) 
-        .then((successValue)  => {
-          console.log('And finally here is the successValue: ' + successValue.data);
+        .then((successValue)  => {          
           res.json(successValue.data);
         });
     });

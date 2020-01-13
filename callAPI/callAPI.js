@@ -41,8 +41,7 @@ const tickerSymbols = {
 }
 
 
-module.exports.getPrice = (stock) => {
-  
+module.exports.getPrice = (stock) => {  
   return new Promise((resolve, reject) => {
     let stockSymbol = getStockSymbol(stock.name);
     //let urlInfo = buildUrlInfo(stockSymbol); 
@@ -53,6 +52,7 @@ module.exports.getPrice = (stock) => {
         resolve(successValue);
       }).catch((error) => {
         console.log(error);
+        reject(error);
       });
   });
 };

@@ -14,12 +14,12 @@ exports.registerUser = (req, res) => {
     // save user to database
     let userToAddDatabase = new UserModelForDatabase({
       username : username,
-    password : password,
-    firstName: firstName,
-    lastName : lastName,
-    email: email,
-    phone: phone,
-    stocks: []
+      password : password,
+      firstName: firstName,
+      lastName : lastName,
+      email: email,
+      phone: phone,
+      stocks: []
     });    
 
     // const userDataForDatabase = new UserModelForDatabase(userToRegister);
@@ -33,7 +33,7 @@ exports.registerUser = (req, res) => {
     
     userToAddDatabase.save().then((result) => {
       console.log('Saved user to DB successfully');
-      res.status(200).json(savedUser);
+      res.status(200).json(result);
     }).catch((error) => {
       console.log('Error saving the user to the database: ' + error);
     });
