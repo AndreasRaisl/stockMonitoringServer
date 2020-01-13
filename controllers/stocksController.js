@@ -1,9 +1,13 @@
 const path = require('path')
-const Stock = require('../models/classDefinitions/stock');
+//const Stock = require('../models/classDefinitions/stock');
+
 const StockModelForDatabase = require('../models/modelsForMongoose/stockModelMongoose');
+const UserModelForDatabase = require('../models/modelsForMongoose/userModelMongoose');
 const stocksApi = require('../callAPI/callAPI');
 const constructPath = require('./../utils/constructPath');
 let parentDir = constructPath.getParentDir();
+
+let currentUser = 'Franky';
 
 // let dataFromFile =  fs.readFileSync(path.join(parentDir, 'data', 'stocks.json'));
 // const myStocks = JSON.parse(dataFromFile);
@@ -44,7 +48,7 @@ exports.getAllStocksData = (req, res, next) => {
   // res.status(200).sendFile(path.join(parentDir, 'data', 'stocks.json'));
 };
 
-exports.getAddStockView = (req, res, next) => {
+exports.getAddStockView = (req, res) => {
   console.log("Got a request to the add-stock page");
   res.status(200).sendFile(path.join(parentDir, 'views', 'addStock.html'));
 };
@@ -62,16 +66,25 @@ exports.addStock = (req, res) => {
     stockToAddDatabase.name = req.body.name;
     stockToAddDatabase.wkn = req.body.wkn;
     stockToAddDatabase.price = 150;
-    let stockToAdd = new Stock(req.body.name, req.body.wkn);
+    
     stocksApi.getPrice(stockToAddDatabase);
-
   
-    stockToAddDatabase.save((err, savedStock) => {
-      if(err) console.log('Error saving the stock to database');
-      else {
+    // stockToAddDatabase.save((err, savedStock) => {
+    //   if(err) console.log('Error saving the stock to database');
+    //   else {
+    //     console.log('Saved to DB successfully');
+    //     res.status(200).json(savedStock);
+    //   } 
+    // });
+
+    UserModelForDatabase.findOne({username: currentUser}).then((result) => {
+      result.stocks.push(stockToAddDatabase);
+      result.save().then((result) => {
         console.log('Saved to DB successfully');
-        res.status(200).json(savedStock);
-      } 
+        res.status(200).json(result);
+      }).catch((error) => {
+        console.log('Error saving the new stock to the database: ' + error);
+      });      
     });
   }
 }
@@ -91,6 +104,8 @@ exports.updatePrice = (req, res) => {
 };
 
 exports.deleteStock = (req, res) => {
+  console.log('Got a request to delete a stock');
+  console.log(req.body);  
   let idToDelete = req.params.id; 
   // StockModelForDatabase.findByIdAndRemove(idToDelete, (err, deletedStock) => {
   //   if(err) {
@@ -102,9 +117,12 @@ exports.deleteStock = (req, res) => {
   //   }
   // }); 
   
-  StockModelForDatabase.findByIdAndRemove(idToDelete).then((result) => {
+  StockModelForDatabase.findByIdAndRemove(idToDelete).then((deletedStock) => {
     console.log("Successful deletion");
     res.json(deletedStock);
+  }).catch((error) => {
+    console.log(error);
+    res.send('Error deleting record');
   });
   
   // StockModelForDatabase.findOneAndRemove({name: req.body.name}).then((response) => {
@@ -113,28 +131,14 @@ exports.deleteStock = (req, res) => {
 }
 
 
-// customerObject.deleteOne(query, function (err, result) {
-
-//   if (err) {
-
-//       console.log("error query");
-
-//   } else {
-
-//       console.log(result);
-
-//   }
-
-// });
-
 function updatePriceInDatabase(stock, newPrice) {
   console.log('The actual name is :' + stock.name);
   let nameToFind = stock.name;
   console.log('The actual _id is :' + stock._id);
-  let idToFind = stock._id;
+  //let idToFind = stock._id;
   return new Promise((resolve, reject) => {
     //StockModelForDatabase.findOneAndUpdate({name: nameToFind},{$set:{price: newPrice}},{new:true})
-    StockModelForDatabase.findOneAndUpdate({_id: idToFind},{$set:{price: newPrice}},{new:true})
+    StockModelForDatabase.findOneAndUpdate({_id: stock._id},{price: newPrice},{new:true})
       .then((updatedDoc)=>{
       if(updatedDoc) {
         console.log('Successfully updated in database');

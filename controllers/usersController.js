@@ -12,21 +12,31 @@ exports.registerUser = (req, res) => {
     // let userToRegister = new User(username, password, firstName, lastName, email, phone);     
     // userToRegister.registerUser(); 
     // save user to database
-    let userToAddDatabase = new UserModelForDatabase();
-    userToAddDatabase.username = username;
-    userToAddDatabase.password = password;
-    userToAddDatabase.firstName = firstName;
-    userToAddDatabase.lastName = lastName;
-    userToAddDatabase.email = email;
-    userToAddDatabase.phone = phone;
-    // const userDataForDatabase = new UserModelForDatabase(userToRegister);
-    userToAddDatabase.save((err, savedUser) => {
-      if(err) console.log('Error saving the user to database');
-      else {
-        console.log('Saved user to DB successfully');
-        res.status(200).json(savedUser);
-      }
+    let userToAddDatabase = new UserModelForDatabase({
+      username : username,
+    password : password,
+    firstName: firstName,
+    lastName : lastName,
+    email: email,
+    phone: phone,
+    stocks: []
     });    
+
+    // const userDataForDatabase = new UserModelForDatabase(userToRegister);
+    // userToAddDatabase.save((err, savedUser) => {
+    //   if(err) console.log('Error saving the user to database');
+    //   else {
+    //     console.log('Saved user to DB successfully');
+    //     res.status(200).json(savedUser);
+    //   }
+    // });  
+    
+    userToAddDatabase.save().then((result) => {
+      console.log('Saved user to DB successfully');
+      res.status(200).json(savedUser);
+    }).catch((error) => {
+      console.log('Error saving the user to the database: ' + error);
+    });
   }   
 }
 

@@ -15,18 +15,31 @@ const tickerSymbols = {
   'Beiersdorf': 'BEI.DE',
   'BMW': 'BMW.DE',
   'Continental': 'CON.DE',
-  'Covestro': '1COV.DE',
+  'Covestro': '1COV.DE',    
   'Daimler': 'DAI.DE',
   'Deutsche Bank': 'DBK.DE',
   'Deutsche Börse': 'DB1.DE',
   'Deutsche Post': 'DPW.DE',
-  'Deutsche Telekom': 'DTE.DE',  
-  'Volkswagen': 'VOW3.FRK',  
+  'Deutsche Telekom': 'DTE.DE',
   'E.ON': 'EOAN.DE',
+  'Fresenius': 'FRE.DE',
+  'Fresenius Medical Care': 'FME.DE',
+  'Henkel': 'HEN3.DE',
+  'HeidelbergCement': 'HEI.DE',
+  'Infineon': 'IFX.DE', 
+  'Linde': 'LIN.DE',
   'Lufthansa': 'LHA.DE',
-  'Wirecard': 'WDI.DE',
-  'SAP': 'SAPA.DE'
+  'MTU Aero Engines': 'MTX.DE',
+  'Merck': 'MRK.DE',
+  'Munich Re': 'MUV2.DE',
+  'RWE': 'RWE.DE',  
+  'SAP': 'SAP.DE',
+  'Siemens': 'SIE.DE',
+  'Volkswagen': 'VOW3.FRK',
+  'Vonovia': 'VNA.DE',
+  'Wirecard': 'WDI.DE'
 }
+
 
 module.exports.getPrice = (stock) => {
   
