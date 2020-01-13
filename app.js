@@ -6,7 +6,7 @@ const routes = require('./routes/routes');
 const Handlebars = require('express-handlebars');
 const connectDB = require('./database/connection');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.engine('hbs', Handlebars());
 app.set('view engine', 'hbs');
